@@ -160,7 +160,19 @@ YESTERDAY=$(python3 -c "import time; print(int(time.time()) - 86400)")
 curl -s "https://hn.algolia.com/api/v1/search?query=LLM+OR+GPT+OR+Claude+OR+Gemini&tags=story&numericFilters=created_at_i%3E$YESTERDAY&hitsPerPage=15"
 ```
 
-### 2. Filter
+### 2. Parse & Extract
+
+**CRITICAL: xreach JSON structure.** Tweets are in `data.items[]`. Each item has:
+- `text` — tweet text (may contain t.co links)
+- `createdAt` — date string like "Fri Mar 20 18:31:49 +0000 2026"
+- `likeCount`, `retweetCount`, `viewCount`
+- `isRetweet`, `isQuote`, `isReply`
+- `entities.urls[]` — **MUST use `expanded_url` field** to get real URLs (arxiv, github, etc.)
+- `media[]` — images/videos
+
+**URL expansion is mandatory.** Never output t.co links. Always extract `entities.urls[].expanded_url`. If entities is empty, resolve t.co links via `curl -sI URL | grep -i location`.
+
+### 3. Filter
 
 **Twitter:**
 - Filter to last 24h
@@ -174,7 +186,43 @@ curl -s "https://hn.algolia.com/api/v1/search?query=LLM+OR+GPT+OR+Claude+OR+Gemi
 
 **HN:** `points > 20`. Deduplicate against Twitter (same URL = merge, note both sources).
 
-### 3. Categorize
+### 4. Enrich (IMPORTANT — this is what makes the digest useful)
+
+After filtering, collect all unique URLs from tweets, blogs, and HN. Then enrich in parallel:
+
+**arxiv papers** — fetch abstract:
+```bash
+curl -s "https://r.jina.ai/https://arxiv.org/abs/PAPER_ID" | head -80
+```
+Extract: title, authors (first 3), abstract (first 2 sentences). This is the **primary value** of the digest — users need to know what the paper actually does, not just its title.
+
+**GitHub repos** — fetch description:
+```bash
+curl -s "https://api.github.com/repos/OWNER/REPO" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('description',''), '|', d.get('stargazers_count',0), 'stars')"
+```
+
+**HuggingFace models** — fetch model card summary:
+```bash
+curl -s "https://r.jina.ai/https://huggingface.co/MODEL_ID" | head -40
+```
+
+**Blog posts** (from Lab Updates) — already fetched in Step 1, extract first paragraph as summary.
+
+**Podcast transcripts** — always fetch (not just with --transcripts). For each new episode:
+- Substack (Latent Space, Dwarkesh): `curl -s "https://r.jina.ai/POST_URL"` — extract key points from transcript
+- YouTube (No Priors, Training Data): `yt-dlp --write-auto-sub --sub-lang en --skip-download`
+
+**Parallelism:** Launch all enrichment fetches in parallel. Typically 5-15 URLs to enrich.
+
+**What "enriched" looks like:**
+
+| Before (bad) | After (good) |
+|-------------|-------------|
+| `**FASTER** — paper | @_akhaliq | 33L` | `**FASTER** — 将 VLA 推理速度提升 5x，通过 flow matching 替代 diffusion 采样，在 LIBERO 上达到 93% 成功率 | [arxiv](https://arxiv.org/abs/...) [github](https://github.com/...) | @_akhaliq | 33L` |
+| `**Nemotron-Cascade 2** — Nvidia 发布` | `**Nemotron-Cascade 2** — Nvidia 的级联推理模型，小模型处理简单 query、大模型处理复杂 query，推理成本降低 3x | [HF](https://huggingface.co/...) [paper](https://arxiv.org/...) | @_akhaliq | 35L` |
+| `**OpenCode** — 开源 AI coding agent | HN 673 pts` | `**OpenCode** — TypeScript 实现的开源 AI coding agent，支持 Claude/GPT/Gemini，类似 Claude Code 的终端体验 (2.1k stars) | [github](https://github.com/nicepkg/opencode) | HN 673 pts` |
+
+### 5. Categorize
 
 | Section | Content |
 |---------|---------|
@@ -187,7 +235,7 @@ curl -s "https://hn.algolia.com/api/v1/search?query=LLM+OR+GPT+OR+Claude+OR+Gemi
 | HN Threads | Top HN discussions on AI/agents (with comment count) |
 | Industry | Company announcements, funding, policy, safety |
 
-### 4. Output
+### 6. Format & Output
 
 ```markdown
 # AI Digest — YYYY-MM-DD
@@ -198,31 +246,32 @@ curl -s "https://hn.algolia.com/api/v1/search?query=LLM+OR+GPT+OR+Claude+OR+Gemi
 3. [Third — 1 sentence]
 
 ## Papers
-- **[Title]** — [1-line summary] | [link] | @source | Likes: N
+- **[Title]** — [2-3 sentence summary from arxiv abstract: what problem, what method, key result] | [arxiv](URL) [github](URL) | @source | Likes: N
 
 ## Models & Releases
-- **[Name]** — [what it does] | [link] | @source | Likes: N
+- **[Name]** — [what it is, key capability, how it compares to previous] | [HF](URL) [paper](URL) | @source | Likes: N
 
 ## Tools & Demos
-- **[Name]** — [what it does] | [link] | @source | Likes: N
+- **[Name]** — [what it does, why it matters, key differentiator] (N stars) | [github](URL) | @source | Likes: N
 
 ## AI Agents
-- **[Title]** — [1-line summary] | [link] | @source | Likes: N
+- **[Title]** — [what it does, architecture insight if available, why notable] | [link](URL) | @source | Likes: N
 
 ## Lab Updates
-- **[DeepMind]** [Title] — [summary] | [link]
-- **[Anthropic]** [Title] — [summary] | [link]
-- **[OpenAI]** [Title] — [summary] | [link]
+- **[DeepMind]** [Title] — [1-paragraph summary of the blog post] | [link](URL)
+- **[Anthropic]** [Title] — [1-paragraph summary] | [link](URL)
+- **[OpenAI]** [Title] — [1-paragraph summary] | [link](URL)
 
 ## Podcasts (Last 7 Days)
-- **[Show Name]** [Episode Title] — [guest/topic] | [link]
-  > [3-sentence summary from transcript, if --transcripts]
+- **[Show Name]** [Episode Title] — [guest name & role] | [link](URL)
+  > [3-5 sentence summary: key thesis, most surprising insight, practical takeaway]
 
 ## HN Threads
-- **[Title]** — [points] pts, [comments] comments | [url] | [hn_link]
+- **[Title]** — [points] pts, [comments] comments | [url](URL) | [HN](URL)
+  > [1-2 sentences: what it is + why HN cares]
 
 ## Industry
-- ...
+- **[Topic]** — [what happened, who's involved, why it matters] | @source | Likes: N
 
 ---
 Sources: Tier1-KOLs(N) [Tier2-Companies(N)] Labs(N) Podcasts(N) HN(N)
@@ -231,11 +280,11 @@ Total: N items
 
 Save to `~/ai-digest/YYYY-MM-DD.md` (create directory if needed).
 
-### 5. Relevance Check
+### 7. Relevance Check
 
 If user has CLAUDE.md or memory files with project keywords, tag matching items with `[RELEVANT]`.
 
-### 6. Summary to User
+### 8. Summary to User
 
 Print concise summary:
 - Top 3 highlights with links
