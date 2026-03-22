@@ -34,6 +34,8 @@ Most "AI news" tools give you a list of links. You still have to click each one,
 | Twitter KOLs | @karpathy, @_akhaliq, @emollick, @simonw, @swyx, and 11 more | 16 default |
 | AI Lab Blogs | DeepMind, Anthropic, OpenAI | 3 |
 | Podcasts | No Priors, Latent Space, Dwarkesh, Training Data (Sequoia) | 4 |
+| arxiv Papers | Topic-filtered search (default: AI agent + LLM) | per topic |
+| HuggingFace Daily | Community-upvoted trending papers | top 20 |
 | HackerNews | AI agent + broader AI/LLM stories | 2 queries |
 | Company accounts | Cursor, xAI, Windsurf, Cognition, Replit, HuggingFace | 6 (with `--full`) |
 
@@ -69,6 +71,15 @@ podcasts:
     - name: "Lex Fridman"
       rss: "https://lexfridman.com/feed/podcast/"
       transcript: youtube
+
+papers:
+  topics:
+    - query: "world model"
+      categories: ["cs.AI", "cs.CV"]
+    - query: "reinforcement learning"
+      categories: ["cs.LG"]
+  hf_daily: true
+  min_hf_upvotes: 5
 
 hn:
   extra_queries:

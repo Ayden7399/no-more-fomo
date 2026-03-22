@@ -94,6 +94,28 @@ To find the YouTube video URL for a podcast episode, search YouTube:
 yt-dlp --flat-playlist "ytsearch1:PODCAST_NAME EPISODE_TITLE" --print url
 ```
 
+### arxiv Papers (Topic-filtered)
+
+Default topics (customizable via config):
+
+| Topic | arxiv Query | Categories |
+|-------|-------------|------------|
+| AI Agents | `abs:"AI agent" OR abs:"LLM agent"` | cs.AI, cs.CL |
+| Large Language Models | `abs:"large language model" OR abs:LLM` | cs.CL, cs.AI |
+
+**arxiv API** — fetch papers from last 24h matching user topics:
+```bash
+curl -s "https://export.arxiv.org/api/query?search_query=cat:cs.AI+AND+abs:AI+agent&sortBy=submittedDate&sortOrder=descending&max_results=10"
+```
+
+**HuggingFace Daily Papers** — community-upvoted trending papers (no topic filter, but quality signal):
+```bash
+curl -s "https://huggingface.co/api/daily_papers?limit=20"
+```
+Filter: `upvotes >= 3` (configurable via `min_hf_upvotes`).
+
+**Merge logic:** Deduplicate by arxiv ID across both sources. If a paper appears in both arxiv topic search AND HF daily, mark it as high-signal.
+
 ### HackerNews
 
 Two parallel searches via HN Algolia API, filtered to last 24h:
@@ -122,6 +144,20 @@ twitter:
   remove:                       # Accounts to skip from defaults
     - "@ylecun"
     - "@hardmaru"
+
+papers:
+  topics:                       # arxiv topic searches (default: ai agent + llm)
+    - query: "AI agent"
+      categories: ["cs.AI", "cs.CL"]
+    - query: "large language model"
+      categories: ["cs.CL", "cs.AI"]
+    # Add your own:
+    # - query: "world model"
+    #   categories: ["cs.AI", "cs.CV"]
+    # - query: "diffusion transformer"
+    #   categories: ["cs.CV"]
+  hf_daily: true                # Also pull HuggingFace trending papers
+  min_hf_upvotes: 3             # Quality threshold for HF papers
 
 podcasts:
   add:
@@ -205,6 +241,19 @@ curl -s "https://r.jina.ai/https://api.substack.com/feed/podcast/1084089.rss"
 curl -s "https://r.jina.ai/https://apple.dwarkesh-podcast.workers.dev/feed.rss"
 curl -s "https://r.jina.ai/https://feeds.megaphone.fm/trainingdata"
 ```
+
+**arxiv Papers (one call per topic from config, default: ai agent + llm):**
+```bash
+# For each topic, build query from categories + keywords
+curl -s "https://export.arxiv.org/api/query?search_query=(cat:cs.AI+OR+cat:cs.CL)+AND+abs:%22AI+agent%22&sortBy=submittedDate&sortOrder=descending&max_results=10"
+curl -s "https://export.arxiv.org/api/query?search_query=(cat:cs.CL+OR+cat:cs.AI)+AND+abs:%22large+language+model%22&sortBy=submittedDate&sortOrder=descending&max_results=10"
+```
+
+**HuggingFace Daily Papers:**
+```bash
+curl -s "https://huggingface.co/api/daily_papers?limit=20"
+```
+Filter to `upvotes >= 3` (or `min_hf_upvotes` from config). Extract: title, arxiv ID, upvotes.
 
 **HackerNews:**
 ```bash
