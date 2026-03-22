@@ -331,7 +331,6 @@ curl -s "https://r.jina.ai/https://huggingface.co/MODEL_ID" | head -40
 
 | Section | Content |
 |---------|---------|
-| Papers | arxiv, OpenReview, research blog posts |
 | Models & Releases | New models, checkpoints, fine-tunes, API launches |
 | Tools & Demos | Libraries, frameworks, demos, open-source tools |
 | AI Agents | Agent frameworks, benchmarks, real-world agent stories |
@@ -339,6 +338,8 @@ curl -s "https://r.jina.ai/https://huggingface.co/MODEL_ID" | head -40
 | Podcasts | New episodes from tracked shows (last 7 days) |
 | HN Threads | Top HN discussions on AI/agents (with comment count) |
 | Industry | Company announcements, funding, policy, safety |
+| HF Trending Papers | HuggingFace community-upvoted papers (bottom, Part 1) |
+| arxiv: [Topic] | Per-topic arxiv search results (bottom, Part 2) |
 
 ### 6. Format & Output
 
@@ -349,9 +350,6 @@ curl -s "https://r.jina.ai/https://huggingface.co/MODEL_ID" | head -40
 1. [Most important — 1 sentence]
 2. [Second — 1 sentence]
 3. [Third — 1 sentence]
-
-## Papers
-- **[Title]** — [2-3 sentence summary from arxiv abstract: what problem, what method, key result] | [arxiv](URL) [github](URL) | @source | Likes: N
 
 ## Models & Releases
 - **[Name]** — [what it is, key capability, how it compares to previous] | [HF](URL) [paper](URL) | @source | Likes: N
@@ -379,7 +377,24 @@ curl -s "https://r.jina.ai/https://huggingface.co/MODEL_ID" | head -40
 - **[Topic]** — [what happened, who's involved, why it matters] | @source | Likes: N
 
 ---
-Sources: Tier1-KOLs(N) [Tier2-Companies(N)] Labs(N) Podcasts(N) HN(N)
+
+## HF Trending Papers
+Community-upvoted papers from [HuggingFace Daily Papers](https://huggingface.co/papers). Sorted by upvotes, no topic filter — shows what the broader ML community finds interesting today.
+
+- **[Title]** (N upvotes) — [1-2 sentence summary] | [arxiv](URL) [HF](https://huggingface.co/papers/ID)
+
+## arxiv: AI Agents
+Recent papers matching `"AI agent" OR "LLM agent"` in cs.AI, cs.CL. Customize topics in `~/.no-more-fomo/config.yaml`.
+
+- **[Title]** — [2-3 sentence summary from abstract] | [arxiv](URL) | categories
+
+## arxiv: Large Language Models
+Recent papers matching `"large language model"` in cs.CL, cs.AI.
+
+- **[Title]** — [2-3 sentence summary from abstract] | [arxiv](URL) | categories
+
+---
+Sources: Tier1-KOLs(N) [Tier2-Companies(N)] Labs(N) Podcasts(N) HN(N) HF-Trending(N) arxiv(N)
 Total: N items
 ```
 
