@@ -4,9 +4,11 @@ description: "Never miss what matters in AI. Daily intelligence from 16 KOLs, 3 
 disable-model-invocation: false
 ---
 
-# AI Digest
+# No More FOMO
 
-Multi-source daily AI intelligence: Twitter KOLs + AI lab blogs + tech podcasts + HackerNews.
+Daily AI intelligence briefing: Twitter KOLs + AI lab blogs + tech podcasts + HackerNews.
+
+**IMPORTANT: All digest output MUST be in English.** Summaries, descriptions, and commentary — everything in the saved markdown file and the summary shown to the user must be English. Even if source content is in Chinese or other languages, translate to English for the digest.
 
 ## When to Use
 
@@ -238,7 +240,7 @@ curl -s "https://r.jina.ai/https://huggingface.co/MODEL_ID" | head -40
 ### 6. Format & Output
 
 ```markdown
-# AI Digest — YYYY-MM-DD
+# No More FOMO Digest — YYYY-MM-DD
 
 ## Top Highlights
 1. [Most important — 1 sentence]
@@ -320,7 +322,7 @@ Print concise summary:
 ## Scheduling
 
 ```bash
-claude -p "run /no-more-fomo and save the report" \
+claude -p "run /no-more-fomo and save the digest" \
   --allowedTools "Bash,Read,Write,Glob" \
   --output-format stream-json
 ```
