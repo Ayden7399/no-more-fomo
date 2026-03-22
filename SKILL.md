@@ -1,6 +1,6 @@
 ---
-name: ai-digest
-description: "Daily AI intelligence briefing from Twitter KOLs, AI lab blogs, tech podcasts, and HackerNews. Use when user says 'digest', 'daily', 'AI news', 'today's papers', 'what's new in AI', or on scheduled cron."
+name: no-more-fomo
+description: "Never miss what matters in AI. Daily intelligence from 16 KOLs, 3 AI labs, 4 podcasts, and HackerNews. Use when user says 'fomo', 'digest', 'daily', 'AI news', 'today's papers', 'what's new in AI', 'catch up', or on scheduled cron."
 disable-model-invocation: false
 ---
 
@@ -56,7 +56,7 @@ Multi-source daily AI intelligence: Twitter KOLs + AI lab blogs + tech podcasts 
 | @huggingface | Hugging Face | Open-source models & datasets |
 | @llama_index | LlamaIndex | RAG, AI agents for documents |
 
-Users can also add any handle via arguments: `/ai-digest @someone`
+Users can also add any handle via arguments: `/no-more-fomo @someone`
 
 ### AI Lab Blogs
 
@@ -278,7 +278,7 @@ Sources: Tier1-KOLs(N) [Tier2-Companies(N)] Labs(N) Podcasts(N) HN(N)
 Total: N items
 ```
 
-Save to `~/ai-digest/YYYY-MM-DD.md` (create directory if needed).
+Save to `~/no-more-fomo/YYYY-MM-DD.md` (create directory if needed).
 
 ### 7. Relevance Check
 
@@ -320,7 +320,7 @@ Print concise summary:
 ## Scheduling
 
 ```bash
-claude -p "run /ai-digest and save the report" \
+claude -p "run /no-more-fomo and save the report" \
   --allowedTools "Bash,Read,Write,Glob" \
   --output-format stream-json
 ```

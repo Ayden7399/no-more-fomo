@@ -1,81 +1,100 @@
-# ai-digest
+# no-more-fomo
 
-Daily AI intelligence briefing for Claude Code. Aggregates Twitter KOLs, AI lab blogs, tech podcasts, and HackerNews into a single digest.
+> You wake up. 47 new arxiv papers. 200 AI tweets. 3 podcast episodes. A new model just dropped.
+>
+> You're already behind.
+>
+> **Or are you?**
 
-## Install
+One command. Every morning. Never miss what matters.
 
-Add to your Claude Code skills directory:
-
-```bash
-# Clone into your skills folder
-git clone https://github.com/freemty/ai-digest.git ~/.claude/skills/ai-digest
-```
-
-Or add it as a plugin dependency in your `settings.json`.
-
-## Usage
+`/no-more-fomo` turns the firehose of AI news into a single enriched daily digest — with real summaries, real links, and real context. Not just headlines.
 
 ```
-/ai-digest                    # Full daily digest
-/ai-digest --full             # Include Tier 2 company accounts
-/ai-digest --transcripts      # Add podcast transcript summaries
-/ai-digest --podcasts-only    # Only check podcast feeds
-/ai-digest --hn-only          # Only HN stories
-/ai-digest @someone           # Add extra Twitter handle
+npx skills add freemty/no-more-fomo
 ```
+
+**[See a real example digest](examples/2026-03-22.md)** to know exactly what you get.
+
+## What makes this different
+
+Most "AI news" tools give you a list of links. You still have to click each one, read it, and decide if it matters.
+
+`/no-more-fomo` does the reading for you:
+
+- Papers come with **2-3 sentence summaries from the actual arxiv abstract**
+- Podcasts come with **key takeaways extracted from transcripts**
+- HN threads come with **context on why the community cares**
+- Everything has **real links** — arxiv, GitHub, HuggingFace, not t.co
 
 ## Sources
 
-### Twitter (16 default + 6 on-demand)
+| Category | What | Count |
+|----------|------|-------|
+| Twitter KOLs | @karpathy, @_akhaliq, @emollick, @simonw, @swyx, and 11 more | 16 default |
+| AI Lab Blogs | DeepMind, Anthropic, OpenAI | 3 |
+| Podcasts | No Priors, Latent Space, Dwarkesh, Training Data (Sequoia) | 4 |
+| HackerNews | AI agent + broader AI/LLM stories | 2 queries |
+| Company accounts | Cursor, xAI, Windsurf, Cognition, Replit, HuggingFace | 6 (with `--full`) |
 
-**Tier 1 (always):** @_akhaliq, @karpathy, @dotey, @bcherny, @oran_ge, @trq212, @swyx, @emollick, @drjimfan, @simonw, @hardmaru, @ylecun, @cursor_ai, @AnthropicAI, @OpenAI, @GoogleDeepMind
-
-**Tier 2 (`--full`):** @xai, @WindsurfAI, @cognition, @replit, @huggingface, @llama_index
-
-### AI Lab Blogs
-- DeepMind (RSS)
-- Anthropic (web scrape)
-- OpenAI (RSS)
-
-### Podcasts (with transcript support)
-- No Priors (YouTube subs)
-- Latent Space (Substack transcript)
-- Dwarkesh Podcast (Substack transcript)
-- Training Data / Sequoia (YouTube subs)
-
-### HackerNews
-- AI agent stories (Algolia API, 24h window)
-- Broader AI coverage (LLM/GPT/Claude/Gemini)
-
-## Prerequisites
-
-- [xreach](https://github.com/nicepkg/xreach) (`npm i -g xreach-cli`) for Twitter
-- `curl` for RSS/HN (standard)
-- [yt-dlp](https://github.com/yt-dlp/yt-dlp) for podcast transcripts (optional)
-- Jina Reader (free, no auth)
-
-## Output
-
-Saves daily digest to `~/ai-digest/YYYY-MM-DD.md` with sections:
-- Top Highlights (top 3)
-- Papers
-- Models & Releases
-- Tools & Demos
-- AI Agents
-- Lab Updates
-- Podcasts (with transcript summaries when `--transcripts`)
-- HN Threads
-- Industry
-
-## Scheduling
+## Usage
 
 ```bash
-claude -p "run /ai-digest --transcripts and save the report" \
+/no-more-fomo                    # Daily digest — all default sources
+/no-more-fomo --full             # Also include company/product accounts
+/no-more-fomo --transcripts      # Add podcast transcript summaries
+/no-more-fomo @someone           # Add any Twitter handle
+/no-more-fomo --hn-only          # Just HackerNews
+/no-more-fomo --podcasts-only    # Just podcast feeds
+```
+
+Saves to `~/no-more-fomo/YYYY-MM-DD.md`.
+
+## Install
+
+### Via skills.sh (recommended)
+
+```bash
+npx skills add freemty/no-more-fomo
+```
+
+Works with Claude Code, Cursor, Codex, Windsurf, and [15+ other agents](https://skills.sh).
+
+### Manual
+
+```bash
+git clone https://github.com/freemty/no-more-fomo.git ~/.claude/skills/no-more-fomo
+```
+
+### Prerequisites
+
+- [xreach](https://github.com/nicepkg/xreach) (`npm i -g xreach-cli`) — Twitter/X data
+- [yt-dlp](https://github.com/yt-dlp/yt-dlp) — podcast transcripts (optional)
+- `curl` — RSS feeds and HN API (standard on all systems)
+
+## Schedule it
+
+Run it automatically every morning:
+
+```bash
+claude -p "run /no-more-fomo and save the report" \
   --allowedTools "Bash,Read,Write,Glob" \
   --output-format stream-json
 ```
 
-Recommended: 9:00 AM local time.
+## How it works
+
+1. **Fetch** — pulls from all sources in parallel (16+ Twitter accounts, 3 blogs, 4 podcasts, HN)
+2. **Parse** — extracts expanded URLs from tweet entities (never outputs t.co links)
+3. **Filter** — last 24h for Twitter/HN, last 7 days for blogs/podcasts, quality thresholds
+4. **Enrich** — fetches arxiv abstracts, GitHub descriptions, podcast transcripts
+5. **Categorize** — Papers, Models, Tools, Agents, Lab Updates, Podcasts, HN, Industry
+6. **Output** — structured markdown with summaries, links, and engagement metrics
+
+## More from freemty
+
+- [labmate](https://github.com/freemty/labmate) — Research harness for Claude Code
+- [agent-reach](https://github.com/nicepkg/xreach) — Give your AI agent eyes to see the internet
 
 ## License
 
