@@ -100,11 +100,65 @@ Two parallel searches via HN Algolia API, filtered to last 24h:
 1. `ai agent` — agent-specific stories
 2. `LLM OR GPT OR Claude OR Gemini` — broader AI coverage
 
+## User Config (Optional)
+
+Users can customize sources by creating `~/.no-more-fomo/config.yaml`. The skill merges this with defaults — users only specify what they want to change.
+
+**Before fetching, always check if config exists:**
+```bash
+cat ~/.no-more-fomo/config.yaml 2>/dev/null
+```
+
+**Config format:**
+```yaml
+# ~/.no-more-fomo/config.yaml
+
+twitter:
+  add:                          # Extra accounts to follow
+    - handle: "@elonmusk"
+      count: 15
+    - handle: "@sama"
+      count: 15
+  remove:                       # Accounts to skip from defaults
+    - "@ylecun"
+    - "@hardmaru"
+
+podcasts:
+  add:
+    - name: "Lex Fridman"
+      rss: "https://lexfridman.com/feed/podcast/"
+      transcript: youtube       # youtube | substack | none
+    - name: "80000 Hours"
+      rss: "https://feeds.feedburner.com/80000HoursPodcast"
+      transcript: none
+  remove:
+    - "Training Data"           # Match by podcast name
+
+blogs:
+  add:
+    - name: "Meta AI"
+      url: "https://ai.meta.com/blog/"
+  remove: []
+
+hn:
+  extra_queries:                # Additional HN search terms
+    - "robotics"
+    - "computer vision"
+
+language: en                    # en | zh — output language
+```
+
+**Merge rules:**
+- `add` items are appended to defaults
+- `remove` items are excluded from defaults (match by handle or name)
+- If no config file exists, use all defaults as-is
+- Unspecified sections keep their defaults
+
 ## Process
 
 ### 1. Fetch All Sources (PARALLEL)
 
-Launch ALL fetches in parallel. Use separate Bash tool calls.
+Launch ALL fetches in parallel. Use separate Bash tool calls. **First read `~/.no-more-fomo/config.yaml` if it exists, then merge with defaults to determine the final source list.**
 
 **Twitter — Tier 1 (always, one call per account):**
 ```bash

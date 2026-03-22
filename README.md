@@ -50,6 +50,35 @@ Most "AI news" tools give you a list of links. You still have to click each one,
 
 Saves to `~/no-more-fomo/YYYY-MM-DD.md`.
 
+## Customize your sources
+
+Create `~/.no-more-fomo/config.yaml` to add/remove sources. You only specify what you want to change — everything else keeps the defaults.
+
+```yaml
+twitter:
+  add:
+    - handle: "@elonmusk"
+      count: 15
+    - handle: "@sama"
+      count: 15
+  remove:
+    - "@ylecun"
+
+podcasts:
+  add:
+    - name: "Lex Fridman"
+      rss: "https://lexfridman.com/feed/podcast/"
+      transcript: youtube
+
+hn:
+  extra_queries:
+    - "robotics"
+
+language: en   # en | zh
+```
+
+See [SKILL.md](SKILL.md#user-config-optional) for the full config reference.
+
 ## Install
 
 ### Via skills.sh (recommended)
