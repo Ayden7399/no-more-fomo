@@ -114,12 +114,20 @@ git clone https://github.com/freemty/no-more-fomo.git ~/.claude/skills/no-more-f
 
 ## Schedule it
 
-Run it automatically every morning:
+### Claude Code Cloud (recommended)
+
+Go to [preview.claude.ai/code](https://preview.claude.ai/code) → **Scheduled** → **+ New scheduled task**:
+
+- **Name:** `no-more-fomo`
+- **Prompt:** `run /no-more-fomo and save the digest`
+- **Frequency:** Daily, 09:00 AM
+
+Runs on cloud infra — no local machine needed.
+
+### Local fallback (crontab)
 
 ```bash
-claude -p "run /no-more-fomo and save the report" \
-  --allowedTools "Bash,Read,Write,Glob" \
-  --output-format stream-json
+0 9 * * * claude -p "run /no-more-fomo and save the digest" --allowedTools "Bash,Read,Write,Glob" --output-format stream-json >> /tmp/no-more-fomo.log 2>&1
 ```
 
 ## How it works

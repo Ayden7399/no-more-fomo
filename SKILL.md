@@ -1,6 +1,6 @@
 ---
 name: no-more-fomo
-description: "Never miss what matters in AI. Daily intelligence from 16 KOLs, 3 AI labs, 4 podcasts, and HackerNews. Use when user says 'fomo', 'digest', 'daily', 'AI news', 'today's papers', 'what's new in AI', 'catch up', or on scheduled cron."
+description: "Never miss what matters in AI. Daily intelligence from 16 KOLs, 3 AI labs, 4 podcasts, arxiv topic search, HuggingFace trending papers, and HackerNews. Use when user says 'fomo', 'digest', 'daily', 'AI news', 'today's papers', 'what's new in AI', 'catch up', or on scheduled cron."
 disable-model-invocation: false
 ---
 
@@ -439,13 +439,25 @@ Print concise summary:
 
 ## Scheduling
 
-```bash
-claude -p "run /no-more-fomo and save the digest" \
-  --allowedTools "Bash,Read,Write,Glob" \
-  --output-format stream-json
-```
+### Claude Code Cloud (recommended)
 
-Recommended: 9:00 AM local time.
+Go to [preview.claude.ai/code](https://preview.claude.ai/code) → **Scheduled** → **+ New scheduled task**:
+
+| Field | Value |
+|-------|-------|
+| Name | `no-more-fomo` |
+| Prompt | `run /no-more-fomo and save the digest` |
+| Frequency | Daily |
+| Time | 09:00 AM |
+
+Runs on cloud infra — no local machine needed.
+
+### Local fallback (crontab)
+
+```bash
+# Add to crontab
+0 9 * * * claude -p "run /no-more-fomo and save the digest" --allowedTools "Bash,Read,Write,Glob" --output-format stream-json >> /tmp/no-more-fomo.log 2>&1
+```
 
 ## Fallback
 
