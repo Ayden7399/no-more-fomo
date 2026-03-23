@@ -1,7 +1,8 @@
 ---
 name: no-more-fomo
-description: "Never miss what matters in AI. Daily intelligence from 16 KOLs, 3 AI labs, 4 podcasts, arxiv topic search, HuggingFace trending papers, and HackerNews. Use when user says 'fomo', 'digest', 'daily', 'AI news', 'today's papers', 'what's new in AI', 'catch up', or on scheduled cron."
-disable-model-invocation: false
+description: >
+  Use when user says 'fomo', 'digest', 'daily', 'AI news', 'today's papers',
+  'what's new in AI', 'catch up', or on a scheduled daily cron trigger.
 ---
 
 # No More FOMO
