@@ -253,7 +253,9 @@ const footerMatch = md.match(/^(Sources:.+)$/m);
 const totalMatch = md.match(/^(Total:.+)$/m);
 const footerText = [footerMatch?.[1], totalMatch?.[1]].filter(Boolean).join(' | ');
 
-const metaText = footerText.replace('Sources: ', '').replace(/\s*\|\s*Total:/, ' |');
+// Meta for header: just total items count, keep it short
+const totalItems = totalMatch ? totalMatch[1] : '';
+const metaText = totalItems;
 
 const html = template
   .replace(/\{\{DIGEST_DATE\}\}/g, date)

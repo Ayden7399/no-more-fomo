@@ -81,7 +81,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      max-width: 1200px;
+      max-width: 860px;
       margin: 0 auto;
       flex-wrap: wrap;
       gap: 12px;
@@ -166,11 +166,9 @@
       background: var(--surface-warm);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      margin: 16px 24px;
-      padding: 14px 18px;
-      max-width: 1200px;
-      margin-left: auto;
-      margin-right: auto;
+      margin: 20px auto;
+      padding: 16px 20px;
+      max-width: 860px;
     }
 
     .highlights-title {
@@ -179,14 +177,28 @@
       font-size: 10px;
       font-weight: 700;
       letter-spacing: 1px;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
+    }
+
+    .highlights ol {
+      padding-left: 20px;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .highlights li {
+      margin-bottom: 4px;
+    }
+
+    .highlights li b {
+      color: var(--text);
     }
 
     /* ===== Content Layout ===== */
     .content {
-      max-width: 1200px;
+      max-width: 860px;
       margin: 0 auto;
-      padding: 0 24px 24px;
+      padding: 0 24px 40px;
     }
 
     .content-wrap {
@@ -227,16 +239,16 @@
 
     /* ===== Section ===== */
     .section {
-      margin-bottom: 20px;
+      margin-bottom: 28px;
     }
 
     .section-header {
       color: var(--accent);
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 700;
-      padding-bottom: 6px;
-      border-bottom: 2px solid var(--accent);
-      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 4px;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -253,8 +265,8 @@
 
     /* ===== Item ===== */
     .item {
-      padding: 8px 0;
-      border-bottom: 1px solid var(--border);
+      padding: 10px 0 12px;
+      border-bottom: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
     }
 
     .item:last-child {
@@ -263,22 +275,26 @@
 
     .item-title {
       font-weight: 700;
-      font-size: 13px;
+      font-size: 14px;
       line-height: 1.4;
     }
 
     .item-desc {
-      font-size: 12px;
+      font-size: 13px;
       color: var(--text-secondary);
-      margin-top: 2px;
-      line-height: 1.5;
+      margin-top: 3px;
+      line-height: 1.6;
     }
 
     .item-meta {
-      font-size: 10px;
+      font-size: 11px;
       font-family: var(--font-mono);
       color: var(--text-muted);
-      margin-top: 3px;
+      margin-top: 5px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
     }
 
     .item-links a {

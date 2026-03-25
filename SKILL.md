@@ -226,31 +226,33 @@ Launch ALL fetches in parallel. Use separate Bash tool calls. **First read `~/.n
 
 ```bash
 # Template for each account (adjust -n and likeCount threshold per account):
-xreach tweets @HANDLE --json -n N | jq '[.items[] | select(.isRetweet==false or .isQuote==true) | {text,createdAt,likeCount,retweetCount,viewCount,isQuote,entities,conversationId}]'
+xreach tweets @HANDLE --json -n N | jq '[.items[] | select(.isRetweet==false or .isQuote==true) | {text,createdAt,likeCount,retweetCount,isQuote,urls: [.entities.urls[]?.expanded_url // empty]}]'
 ```
+
+The `urls` field extracts all expanded URLs from each tweet (arxiv, github, huggingface, etc.), eliminating t.co links. This is the **primary source of links** for the digest — always include these URLs in the output.
 
 **Twitter — Tier 1 (always, one call per account). Batch accounts together (3-4 per Bash call) to reduce tool call overhead:**
 ```bash
 # Batch 1: High volume
-xreach tweets @_akhaliq --json -n 50 | jq '[.items[] | select(.isRetweet==false or .isQuote==true) | {text,createdAt,likeCount,retweetCount,isQuote,entities}]'
-xreach tweets @dotey --json -n 30 | jq '[.items[] | select(.isRetweet==false or .isQuote==true) | {text,createdAt,likeCount,retweetCount,isQuote,entities}]'
+xreach tweets @_akhaliq --json -n 50 | jq '[.items[] | select(.isRetweet==false or .isQuote==true) | {text,createdAt,likeCount,retweetCount,isQuote,urls:[.entities.urls[]?.expanded_url // empty]}]'
+xreach tweets @dotey --json -n 30 | jq '[.items[] | select(.isRetweet==false or .isQuote==true) | {text,createdAt,likeCount,retweetCount,isQuote,urls:[.entities.urls[]?.expanded_url // empty]}]'
 ```
 ```bash
 # Batch 2: KOLs (chain with &&, each piped through jq)
-for h in karpathy bcherny oran_ge trq212 swyx emollick; do xreach tweets @$h --json -n 20 | jq -c "[.items[] | select(.isRetweet==false or .isQuote==true) | {text,createdAt,likeCount,entities}]"; echo "---$h---"; done
+for h in karpathy bcherny oran_ge trq212 swyx emollick; do xreach tweets @$h --json -n 20 | jq -c "[.items[] | select(.isRetweet==false or .isQuote==true) | {text,createdAt,likeCount,urls:[.entities.urls[]?.expanded_url // empty]}]"; echo "---$h---"; done
 ```
 ```bash
 # Batch 3: More KOLs
-for h in drjimfan simonw hardmaru ylecun; do xreach tweets @$h --json -n 20 | jq -c "[.items[] | select(.isRetweet==false or .isQuote==true) | {text,createdAt,likeCount,entities}]"; echo "---$h---"; done
+for h in drjimfan simonw hardmaru ylecun; do xreach tweets @$h --json -n 20 | jq -c "[.items[] | select(.isRetweet==false or .isQuote==true) | {text,createdAt,likeCount,urls:[.entities.urls[]?.expanded_url // empty]}]"; echo "---$h---"; done
 ```
 ```bash
 # Batch 4: Company accounts
-for h in cursor_ai AnthropicAI OpenAI GoogleDeepMind; do xreach tweets @$h --json -n 15 | jq -c "[.items[] | select(.isRetweet==false or .isQuote==true) | {text,createdAt,likeCount,entities}]"; echo "---$h---"; done
+for h in cursor_ai AnthropicAI OpenAI GoogleDeepMind; do xreach tweets @$h --json -n 15 | jq -c "[.items[] | select(.isRetweet==false or .isQuote==true) | {text,createdAt,likeCount,urls:[.entities.urls[]?.expanded_url // empty]}]"; echo "---$h---"; done
 ```
 
 **Twitter — Tier 2 (only with `--full` flag):**
 ```bash
-for h in xai WindsurfAI cognition replit huggingface llama_index; do xreach tweets @$h --json -n 15 | jq -c "[.items[] | select(.isRetweet==false or .isQuote==true) | {text,createdAt,likeCount,entities}]"; echo "---$h---"; done
+for h in xai WindsurfAI cognition replit huggingface llama_index; do xreach tweets @$h --json -n 15 | jq -c "[.items[] | select(.isRetweet==false or .isQuote==true) | {text,createdAt,likeCount,urls:[.entities.urls[]?.expanded_url // empty]}]"; echo "---$h---"; done
 # + any extra @handles from arguments, same jq filter
 ```
 
