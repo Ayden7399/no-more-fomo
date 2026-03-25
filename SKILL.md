@@ -222,35 +222,36 @@ language: zh                    # zh | en — output language (default: zh)
 
 Launch ALL fetches in parallel. Use separate Bash tool calls. **First read `~/.no-more-fomo/config.yaml` if it exists, then merge with defaults to determine the final source list.**
 
-**Twitter — Tier 1 (always, one call per account):**
+**CRITICAL — Filter at fetch time to minimize context usage.** Pipe xreach output through jq to keep only relevant tweets. This reduces ~30KB/account to ~2KB/account:
+
 ```bash
-xreach tweets @_akhaliq --json -n 50
-xreach tweets @karpathy --json -n 20
-xreach tweets @dotey --json -n 30
-xreach tweets @bcherny --json -n 20
-xreach tweets @oran_ge --json -n 20
-xreach tweets @trq212 --json -n 20
-xreach tweets @swyx --json -n 20
-xreach tweets @emollick --json -n 20
-xreach tweets @drjimfan --json -n 20
-xreach tweets @simonw --json -n 20
-xreach tweets @hardmaru --json -n 20
-xreach tweets @ylecun --json -n 20
-xreach tweets @cursor_ai --json -n 15
-xreach tweets @AnthropicAI --json -n 15
-xreach tweets @OpenAI --json -n 15
-xreach tweets @GoogleDeepMind --json -n 15
+# Template for each account (adjust -n and likeCount threshold per account):
+xreach tweets @HANDLE --json -n N | jq '[.items[] | select(.isRetweet==false or .isQuote==true) | {text,createdAt,likeCount,retweetCount,viewCount,isQuote,entities,conversationId}]'
+```
+
+**Twitter — Tier 1 (always, one call per account). Batch accounts together (3-4 per Bash call) to reduce tool call overhead:**
+```bash
+# Batch 1: High volume
+xreach tweets @_akhaliq --json -n 50 | jq '[.items[] | select(.isRetweet==false or .isQuote==true) | {text,createdAt,likeCount,retweetCount,isQuote,entities}]'
+xreach tweets @dotey --json -n 30 | jq '[.items[] | select(.isRetweet==false or .isQuote==true) | {text,createdAt,likeCount,retweetCount,isQuote,entities}]'
+```
+```bash
+# Batch 2: KOLs (chain with &&, each piped through jq)
+for h in karpathy bcherny oran_ge trq212 swyx emollick; do xreach tweets @$h --json -n 20 | jq -c "[.items[] | select(.isRetweet==false or .isQuote==true) | {text,createdAt,likeCount,entities}]"; echo "---$h---"; done
+```
+```bash
+# Batch 3: More KOLs
+for h in drjimfan simonw hardmaru ylecun; do xreach tweets @$h --json -n 20 | jq -c "[.items[] | select(.isRetweet==false or .isQuote==true) | {text,createdAt,likeCount,entities}]"; echo "---$h---"; done
+```
+```bash
+# Batch 4: Company accounts
+for h in cursor_ai AnthropicAI OpenAI GoogleDeepMind; do xreach tweets @$h --json -n 15 | jq -c "[.items[] | select(.isRetweet==false or .isQuote==true) | {text,createdAt,likeCount,entities}]"; echo "---$h---"; done
 ```
 
 **Twitter — Tier 2 (only with `--full` flag):**
 ```bash
-xreach tweets @xai --json -n 15
-xreach tweets @WindsurfAI --json -n 15
-xreach tweets @cognition --json -n 15
-xreach tweets @replit --json -n 15
-xreach tweets @huggingface --json -n 15
-xreach tweets @llama_index --json -n 15
-# + any extra @handles from arguments
+for h in xai WindsurfAI cognition replit huggingface llama_index; do xreach tweets @$h --json -n 15 | jq -c "[.items[] | select(.isRetweet==false or .isQuote==true) | {text,createdAt,likeCount,entities}]"; echo "---$h---"; done
+# + any extra @handles from arguments, same jq filter
 ```
 
 **AI Lab Blogs (one call per source):**
@@ -556,33 +557,18 @@ Sources: Tier1-KOLs(N) [Tier2-Companies(N)] Labs(N) Podcasts(N/深度N) HN(N) HF
 
 Skip this step if `--no-save` or `--no-html` flag is set.
 
-1. **Read template:** Read `template/digest.html` from the skill's directory (the repo where SKILL.md lives).
+Run the render script (uses bun, <1 second):
+```bash
+bun /path/to/no-more-fomo/scripts/render.js ~/no-more-fomo/YYYY-MM-DD.md
+```
 
-2. **Convert digest to HTML fragments:** Using the current digest content (already in memory from Steps A-C), generate HTML for each component. Do NOT parse the .md file — use the structured data you already have.
+This automatically:
+1. Reads `template/digest.html` and the `.md` file
+2. Parses markdown sections → HTML fragments (with escaping, badges, links)
+3. Replaces `{{PLACEHOLDER}}` markers → writes `YYYY-MM-DD.html`
+4. Scans all `.html` files → regenerates `index.html` with date cards
 
-   **Conversion rules:**
-   - Section headers → `<div class="section" id="SECTION_ID"><div class="section-header" data-zh="中文标题" data-en="English Title">中文标题 <span class="section-count">N</span></div>`
-   - Items → `<div class="item"><div class="item-title">TITLE</div><div class="item-desc">DESC</div><div class="item-meta"><span class="item-links"><a href="URL" target="_blank" rel="noopener">label</a></span> <span class="badge badge-source">@handle</span> NL</div></div>`
-   - Podcast items → same as item but with `<div class="podcast-summary"><div class="tldr">...</div><div class="chapters">...</div><div class="quote">...</div></div>` appended
-   - Podcast loading state (--quick) → `<div class="podcast-summary loading"><div class="tldr" data-zh="⏳ 深度摘要生成中..." data-en="⏳ Generating deep summary...">⏳ 深度摘要生成中...</div></div>`
-   - Community discussion → `<div class="community-discussion">社区热议: ...</div>` inside the `.item`
-   - Empty sections → `<div class="item-empty" data-zh="本周无新内容" data-en="No new content this week">本周无新内容</div>`
-   - Highlights → `<div class="highlights-title" data-zh="今日要点" data-en="Today's Highlights">今日要点</div><ol><li>...</li></ol>`
-   - Sidebar nav → `<a href="#SECTION_ID" data-zh="中文(N)" data-en="English(N)">中文(N)</a>` for each section
-   - Footer → `<span class="footer-text">Sources: Tier1-KOLs(N) ... Total: N items</span>`
-   - **HTML escape** all digest text content: `&` → `&amp;`, `<` → `&lt;`, `>` → `&gt;`, `"` → `&quot;` (in attribute values)
-   - All external links: add `target="_blank" rel="noopener"`
-
-3. **Replace placeholders:** Replace `{{DIGEST_DATE}}`, `{{DIGEST_LANG}}`, `{{DIGEST_META}}`, `{{DIGEST_HIGHLIGHTS}}`, `{{DIGEST_SIDEBAR_NAV}}`, `{{DIGEST_SECTIONS}}`, `{{DIGEST_FOOTER}}` in the template.
-
-4. **Write HTML file:** Write to `~/no-more-fomo/YYYY-MM-DD.html`
-
-5. **Update index:** Scan `~/no-more-fomo/` for files matching `YYYY-MM-DD.html` pattern (ignore `index.html` and other files). For each digest date, extract meta from the corresponding `.md` file or current session memory:
-   - Items count from `Sources:` line
-   - Top highlight from first highlight entry
-   Generate `{{INDEX_ENTRIES}}` with one date card per file (newest first, newest gets `.latest` class). Read `template/index.html`, replace `{{INDEX_ENTRIES}}`, write to `~/no-more-fomo/index.html`.
-
-**For `--quick` mode:** Run this step at the end of Phase 1 instead of Phase 2 (podcast summaries will show loading state). If the user later runs without `--quick`, Phase 2 Step D **fully regenerates** the HTML (re-reads template, re-replaces all placeholders) and overwrites the file.
+**For `--quick` mode:** Run this step at the end of Phase 1. The render script works with whatever content is in the `.md` file at that point.
 
 ## Arguments
 
