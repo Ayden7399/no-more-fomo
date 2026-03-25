@@ -356,56 +356,61 @@ curl -s "https://r.jina.ai/https://huggingface.co/MODEL_ID" | head -40
 
 ### 5. Categorize
 
-| Section | Content |
-|---------|---------|
-| Models & Releases | New models, checkpoints, fine-tunes, API launches |
-| Tools & Demos | Libraries, frameworks, demos, open-source tools |
-| AI Agents | Agent frameworks, benchmarks, real-world agent stories |
-| Lab Updates | DeepMind / Anthropic / OpenAI blog highlights |
-| Podcasts | New episodes from tracked shows (last 7 days) |
-| HN Threads | Top HN discussions on AI/agents (with comment count) |
-| Industry | Company announcements, funding, policy, safety |
-| HF Trending Papers | HuggingFace community-upvoted papers (bottom, Part 1) |
-| arxiv: [Topic] | Per-topic arxiv search results (bottom, Part 2) |
+**Section titles follow `language` config.** The table below shows both versions:
+
+| Section (zh) | Section (en) | Content |
+|--------------|-------------|---------|
+| 模型与发布 | Models & Releases | New models, checkpoints, fine-tunes, API launches |
+| 工具与演示 | Tools & Demos | Libraries, frameworks, demos, open-source tools |
+| AI Agents | AI Agents | Agent frameworks, benchmarks, real-world agent stories |
+| 实验室动态 | Lab Updates | DeepMind / Anthropic / OpenAI blog highlights |
+| 播客 | Podcasts | New episodes from tracked shows (last 7 days) |
+| HN 讨论 | HN Threads | Top HN discussions on AI/agents (with comment count) |
+| 行业动态 | Industry | Company announcements, funding, policy, safety |
+| HF 热门论文 | HF Trending Papers | HuggingFace community-upvoted papers (bottom, Part 1) |
+| arxiv: [主题] | arxiv: [Topic] | Per-topic arxiv search results (bottom, Part 2) |
+| 发现 | Discovery | Phase 2: s.jina.ai web search results (bottom, Part 3) |
 
 ### 6. Format & Output
+
+**The template below uses `zh` section titles (default).** When `language: en`, use the English equivalents from the Categorize table above.
 
 ```markdown
 # No More FOMO Digest — YYYY-MM-DD
 
-## Top Highlights
+## 今日要点
 1. [Most important — 1 sentence]
 2. [Second — 1 sentence]
 3. [Third — 1 sentence]
 
-## Models & Releases
+## 模型与发布
 - **[Name]** — [what it is, key capability, how it compares to previous] | [HF](URL) [paper](URL) | @source | Likes: N
 
-## Tools & Demos
+## 工具与演示
 - **[Name]** — [what it does, why it matters, key differentiator] (N stars) | [github](URL) | @source | Likes: N
 
 ## AI Agents
 - **[Title]** — [what it does, architecture insight if available, why notable] | [link](URL) | @source | Likes: N
 
-## Lab Updates
+## 实验室动态
 - **[DeepMind]** [Title] — [1-paragraph summary of the blog post] | [link](URL)
 - **[Anthropic]** [Title] — [1-paragraph summary] | [link](URL)
 - **[OpenAI]** [Title] — [1-paragraph summary] | [link](URL)
 
-## Podcasts (Last 7 Days)
+## 播客 (Last 7 Days)
 - **[Show Name]** [Episode Title] — [guest name & role] | [link](URL)
-  > [3-5 sentence summary: key thesis, most surprising insight, practical takeaway]
+  > ⏳ 深度摘要生成中...
 
-## HN Threads
+## HN 讨论
 - **[Title]** — [points] pts, [comments] comments | [url](URL) | [HN](URL)
   > [1-2 sentences: what it is + why HN cares]
 
-## Industry
+## 行业动态
 - **[Topic]** — [what happened, who's involved, why it matters] | @source | Likes: N
 
 ---
 
-## HF Trending Papers
+## HF 热门论文
 Community-upvoted papers from [HuggingFace Daily Papers](https://huggingface.co/papers). Sorted by upvotes, no topic filter — shows what the broader ML community finds interesting today.
 
 - **[Title]** (N upvotes) — [1-2 sentence summary] | [arxiv](URL) [HF](https://huggingface.co/papers/ID)
@@ -420,8 +425,13 @@ Recent papers matching `"large language model"` in cs.CL, cs.AI.
 
 - **[Title]** — [2-3 sentence summary from abstract] | [arxiv](URL) | categories
 
+## 发现 (Beyond arxiv/HN)
+来自全网搜索的技术内容，未被 KOL 推文或 HN 覆盖。
+
+- **[类型]** [Title] — [summary in configured language] | [link](URL)
+
 ---
-Sources: Tier1-KOLs(N) [Tier2-Companies(N)] Labs(N) Podcasts(N) HN(N) HF-Trending(N) arxiv(N)
+Sources: Tier1-KOLs(N) [Tier2-Companies(N)] Labs(N) Podcasts(N/深度N) HN(N) HF-Trending(N) arxiv(N) 社区补充(N) 发现(N)
 Total: N items
 ```
 
