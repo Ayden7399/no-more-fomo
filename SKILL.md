@@ -181,6 +181,11 @@ podcasts:
       transcript: none
   remove:
     - "Training Data"           # Match by podcast name
+  depth: full                   # full | none (default: full)
+                                #   full = TLDR + chapters + speaker quotes
+                                #   none = title + description only (skip Phase 2 podcasts)
+  max_episodes: 3               # Max episodes per podcast to deep-process (default: 3)
+  cache_dir: ~/no-more-fomo/.cache/pods  # Transcript cache directory
 
 blogs:
   add:
@@ -192,14 +197,6 @@ hn:
   extra_queries:                # Additional HN search terms
     - "robotics"
     - "computer vision"
-
-podcasts:
-  # ... existing add/remove fields stay unchanged ...
-  depth: full                   # full | none (default: full)
-                                #   full = TLDR + chapters + speaker quotes
-                                #   none = title + description only (skip Phase 2 podcasts)
-  max_episodes: 3               # Max episodes per podcast to deep-process (default: 3)
-  cache_dir: ~/no-more-fomo/.cache/pods  # Transcript cache directory
 
 discovery:
   enabled: true                 # Enable s.jina.ai discovery layer (default: true)
@@ -578,6 +575,7 @@ Sources: Tier1-KOLs(N) [Tier2-Companies(N)] Labs(N) Podcasts(N/深度N) HN(N) HF
 |-------|----------|
 | `--quick` | Phase 1 only |
 | `--quick --full` | Phase 1 + Tier 2, no Phase 2 |
+| `--twitter-only` / `--hn-only` | Skip podcasts in Phase 2 (no podcast data), but Topic Search + Discovery still run |
 | `--podcasts-only` | RSS + Phase 2 deep summaries |
 | `--podcasts-only --quick` | RSS only, no deep summaries |
 | `--twitter-only --quick` | Phase 1 Twitter only |
