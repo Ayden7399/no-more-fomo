@@ -81,22 +81,30 @@ Users can also add any handle via arguments: `/no-more-fomo @someone`
 | Dwarkesh Podcast | `https://apple.dwarkesh-podcast.workers.dev/feed.rss` | Substack post (embedded) | Long-form interviews with AI leaders |
 | Training Data (Sequoia) | `https://feeds.megaphone.fm/trainingdata` | YouTube subs | AI/tech from Sequoia Capital |
 
-**Transcript retrieval (with `--transcripts`):**
+**Transcript retrieval (Phase 2 — automatic, no flag needed):**
 
-Substack-based podcasts (Latent Space, Dwarkesh) embed full transcripts in posts:
+Phase 2 automatically processes new podcast episodes. Primary method uses youtube-transcript:
 ```bash
-curl -s "https://r.jina.ai/POST_URL"  # transcript is inline with timestamps
-```
-
-YouTube-based podcasts (No Priors, Training Data) — use yt-dlp:
-```bash
-yt-dlp --write-auto-sub --sub-lang en --skip-download -o "%(title)s" "VIDEO_URL"
-```
-
-To find the YouTube video URL for a podcast episode, search YouTube:
-```bash
+# Step 1: Find YouTube URL for the episode
+# Preferred: extract youtube.com URL from RSS <enclosure> or <link>
+# Fallback: search YouTube
 yt-dlp --flat-playlist "ytsearch1:PODCAST_NAME EPISODE_TITLE" --print url
 ```
+
+```bash
+# Step 2: Download transcript with chapters and speaker detection
+bun ~/.claude/plugins/ljg-skills/.agents/skills/baoyu-youtube-transcript/scripts/main.ts VIDEO_URL \
+  --chapters --speakers \
+  --languages en,zh \
+  --output-dir ~/no-more-fomo/.cache/pods
+```
+
+**Fallback chain** (if youtube-transcript fails or is not installed):
+1. `yt-dlp --write-auto-sub --sub-lang en --skip-download` — auto-generated subtitles
+2. `curl -s "https://r.jina.ai/POST_URL"` — Substack transcript (Latent Space, Dwarkesh)
+3. Keep basic episode entry (title + description only)
+
+Substack-based podcasts (Latent Space, Dwarkesh) embed full transcripts in posts and can be fetched directly via Jina Reader as a fallback.
 
 ### arxiv Papers (Topic-filtered)
 
