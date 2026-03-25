@@ -552,6 +552,38 @@ Sources: Tier1-KOLs(N) [Tier2-Companies(N)] Labs(N) Podcasts(N/深度N) HN(N) HF
 ```
 `社区补充` and `发现` only appear if Phase 2 produced results for them.
 
+### Phase 2 Step D: Generate HTML
+
+Skip this step if `--no-save` or `--no-html` flag is set.
+
+1. **Read template:** Read `template/digest.html` from the skill's directory (the repo where SKILL.md lives).
+
+2. **Convert digest to HTML fragments:** Using the current digest content (already in memory from Steps A-C), generate HTML for each component. Do NOT parse the .md file — use the structured data you already have.
+
+   **Conversion rules:**
+   - Section headers → `<div class="section" id="SECTION_ID"><div class="section-header" data-zh="中文标题" data-en="English Title">中文标题 <span class="section-count">N</span></div>`
+   - Items → `<div class="item"><div class="item-title">TITLE</div><div class="item-desc">DESC</div><div class="item-meta"><span class="item-links"><a href="URL" target="_blank" rel="noopener">label</a></span> <span class="badge badge-source">@handle</span> NL</div></div>`
+   - Podcast items → same as item but with `<div class="podcast-summary"><div class="tldr">...</div><div class="chapters">...</div><div class="quote">...</div></div>` appended
+   - Podcast loading state (--quick) → `<div class="podcast-summary loading"><div class="tldr" data-zh="⏳ 深度摘要生成中..." data-en="⏳ Generating deep summary...">⏳ 深度摘要生成中...</div></div>`
+   - Community discussion → `<div class="community-discussion">社区热议: ...</div>` inside the `.item`
+   - Empty sections → `<div class="item-empty" data-zh="本周无新内容" data-en="No new content this week">本周无新内容</div>`
+   - Highlights → `<div class="highlights-title" data-zh="今日要点" data-en="Today's Highlights">今日要点</div><ol><li>...</li></ol>`
+   - Sidebar nav → `<a href="#SECTION_ID" data-zh="中文(N)" data-en="English(N)">中文(N)</a>` for each section
+   - Footer → `<span class="footer-text">Sources: Tier1-KOLs(N) ... Total: N items</span>`
+   - **HTML escape** all digest text content: `&` → `&amp;`, `<` → `&lt;`, `>` → `&gt;`, `"` → `&quot;` (in attribute values)
+   - All external links: add `target="_blank" rel="noopener"`
+
+3. **Replace placeholders:** Replace `{{DIGEST_DATE}}`, `{{DIGEST_LANG}}`, `{{DIGEST_META}}`, `{{DIGEST_HIGHLIGHTS}}`, `{{DIGEST_SIDEBAR_NAV}}`, `{{DIGEST_SECTIONS}}`, `{{DIGEST_FOOTER}}` in the template.
+
+4. **Write HTML file:** Write to `~/no-more-fomo/YYYY-MM-DD.html`
+
+5. **Update index:** Scan `~/no-more-fomo/` for files matching `YYYY-MM-DD.html` pattern (ignore `index.html` and other files). For each digest date, extract meta from the corresponding `.md` file or current session memory:
+   - Items count from `Sources:` line
+   - Top highlight from first highlight entry
+   Generate `{{INDEX_ENTRIES}}` with one date card per file (newest first, newest gets `.latest` class). Read `template/index.html`, replace `{{INDEX_ENTRIES}}`, write to `~/no-more-fomo/index.html`.
+
+**For `--quick` mode:** Run this step at the end of Phase 1 instead of Phase 2 (podcast summaries will show loading state). If the user later runs without `--quick`, Phase 2 Step D **fully regenerates** the HTML (re-reads template, re-replaces all placeholders) and overwrites the file.
+
 ## Arguments
 
 | Argument | Effect |
