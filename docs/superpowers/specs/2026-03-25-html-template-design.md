@@ -51,6 +51,8 @@ function setView(view) {
 
 所有视图共享同一份 HTML DOM，通过 `.view-newspaper` / `.view-sidebar` / `.view-grid` class 控制显示。
 
+**默认视图：** `view-newspaper`。用户切换后通过 `localStorage.setItem('fomo-view', view)` 持久化，下次打开自动恢复。
+
 ### Dual Theme
 
 使用 my-design-system 的双主题 token：
@@ -84,39 +86,42 @@ function setLang(lang) {
   document.querySelectorAll('[data-' + lang + ']').forEach(el => {
     el.textContent = el.getAttribute('data-' + lang);
   });
+  localStorage.setItem('fomo-lang', lang);
 }
 ```
+
+**初始语言：** 优先读取 `localStorage.getItem('fomo-lang')`，否则由模板中 `{{DIGEST_LANG}}` 占位符决定（与 SKILL.md 的 `language` 配置一致，默认 `zh`）。
 
 ### Page Structure
 
 ```html
 <div class="header">
-  <!-- 标题: No More FOMO -->
-  <!-- 日期 + items 统计 -->
-  <!-- 控件: view switcher + theme toggle + lang toggle -->
+  <div class="title">No More <span>FOMO</span></div>
+  <div class="meta">{{DIGEST_DATE}} | {{DIGEST_META}}</div>
+  <div class="controls">
+    <!-- view switcher + theme toggle + lang toggle -->
+  </div>
 </div>
 
 <div class="highlights">
-  <!-- Today's Highlights: top 3 -->
-  <!-- DIGEST_HIGHLIGHTS 占位符 -->
+  {{DIGEST_HIGHLIGHTS}}
 </div>
 
 <div class="content" id="mainContent">
   <div class="content-wrap">
     <nav class="sidebar-nav">
-      <!-- section 导航链接 (sidebar 视图用) -->
+      {{DIGEST_SIDEBAR_NAV}}
     </nav>
     <div class="main-content">
       <div class="sections-container">
-        <!-- DIGEST_SECTIONS 占位符 -->
-        <!-- 每个 section: .section div with .section-header + .item list -->
+        {{DIGEST_SECTIONS}}
       </div>
     </div>
   </div>
 </div>
 
 <div class="footer">
-  <!-- DIGEST_FOOTER 占位符 -->
+  {{DIGEST_FOOTER}}
 </div>
 ```
 
@@ -124,12 +129,15 @@ function setLang(lang) {
 
 | Placeholder | Content |
 |-------------|---------|
-| `<!-- DIGEST_DATE -->` | `2026-03-25` |
-| `<!-- DIGEST_META -->` | `53 items \| Tier1-KOLs(12) ...` |
-| `<!-- DIGEST_HIGHLIGHTS -->` | Highlights HTML 片段 |
-| `<!-- DIGEST_SIDEBAR_NAV -->` | Sidebar 导航链接 |
-| `<!-- DIGEST_SECTIONS -->` | 所有 section 的 HTML |
-| `<!-- DIGEST_FOOTER -->` | Sources 行 |
+| `{{DIGEST_DATE}}` | `2026-03-25` |
+| `{{DIGEST_LANG}}` | `zh` 或 `en`（与 config language 一致） |
+| `{{DIGEST_META}}` | `53 items \| Tier1-KOLs(12) ...` |
+| `{{DIGEST_HIGHLIGHTS}}` | Highlights HTML 片段 |
+| `{{DIGEST_SIDEBAR_NAV}}` | Sidebar 导航链接 |
+| `{{DIGEST_SECTIONS}}` | 所有 section 的 HTML |
+| `{{DIGEST_FOOTER}}` | Sources 行 |
+
+**占位符格式：** 使用 `{{NAME}}` 双花括号格式，与普通 HTML 注释区分。Claude 在 Write 前做字符串替换。
 
 ### CSS Component Reference (from my-design-system)
 
@@ -169,6 +177,66 @@ function setLang(lang) {
 </div>
 ```
 
+### Empty Sections
+
+如果某个 section 没有条目，显示空状态而非隐藏（保持结构一致）：
+
+```html
+<div class="section" id="podcasts">
+  <div class="section-header" data-zh="播客" data-en="Podcasts">播客 <span class="section-count">0</span></div>
+  <div class="item-empty" data-zh="本周无新节目" data-en="No new episodes this week">本周无新节目</div>
+</div>
+```
+
+`.item-empty` 使用 `color: var(--text-muted); font-style: italic; padding: 8px 0;`
+
+### Community Discussion (社区热议)
+
+Topic Search 追加的社区讨论在 `.item` 内部作为可选子元素：
+
+```html
+<div class="item">
+  <div class="item-title">OpenCode</div>
+  <div class="item-desc">TypeScript open-source AI coding agent...</div>
+  <div class="item-meta">...</div>
+  <div class="community-discussion">
+    社区热议: 多名开发者反馈在大型 monorepo 上表现优于 Cursor，但插件生态尚不成熟 (来自 5 条高互动推文)
+  </div>
+</div>
+```
+
+`.community-discussion` 样式：`background: var(--bg-secondary); border-radius: var(--radius); padding: 6px 10px; margin-top: 6px; font-size: 11px; color: var(--text-secondary);`
+
+### Podcast Loading State
+
+`--quick` 模式下播客占位符的 HTML 表示：
+
+```html
+<div class="podcast-summary loading">
+  <div class="tldr" data-zh="⏳ 深度摘要生成中..." data-en="⏳ Generating deep summary...">⏳ 深度摘要生成中...</div>
+</div>
+```
+
+`.podcast-summary.loading` 使用 `opacity: 0.6;` 区分。
+
+### External Links
+
+所有指向外部的链接（arxiv, github, huggingface 等）统一使用 `target="_blank" rel="noopener"`。Claude 在生成 `<a>` 标签时自动添加。
+
+### HTML Escaping
+
+Claude 在将 digest 内容嵌入 HTML 时，必须转义以下字符：
+- `&` → `&amp;`
+- `<` → `&lt;`
+- `>` → `&gt;`
+- `"` → `&quot;`（在属性值中）
+
+这仅影响 digest 正文文本，不影响 Claude 自己生成的 HTML 标签结构。
+
+### Phase 2 HTML Update Strategy
+
+Phase 2 完成后更新 HTML 是**完整重新生成**（重新读取模板 + 重新替换所有占位符），而非 Edit 已有 HTML。这保证模板结构始终一致。
+
 ## Design: index.html Template
 
 ### 功能
@@ -202,7 +270,7 @@ function setLang(lang) {
 
 | Placeholder | Content |
 |-------------|---------|
-| `<!-- INDEX_ENTRIES -->` | 日期卡片列表 HTML |
+| `{{INDEX_ENTRIES}}` | 日期卡片列表 HTML |
 
 每张日期卡片：
 
@@ -233,10 +301,10 @@ function setLang(lang) {
    - Badges → <span class="badge badge-source">
    - Links → <a href="...">
 3. Replace placeholders in template → Write ~/no-more-fomo/YYYY-MM-DD.html
-4. Scan ~/no-more-fomo/*.html (excluding index.html):
+4. Scan ~/no-more-fomo/*.html (match pattern: YYYY-MM-DD.html only, ignore index.html and other files):
    - Extract date from filename
    - Extract meta (items count) and first highlight from each file
-   - Read template/index.html, replace INDEX_ENTRIES → Write ~/no-more-fomo/index.html
+   - Read template/index.html, replace {{INDEX_ENTRIES}} → Write ~/no-more-fomo/index.html
 ```
 
 ### Markdown → HTML 转换规则
@@ -259,7 +327,7 @@ function setLang(lang) {
 | (default) | Phase 2 Step D 生成 HTML + 更新 index |
 | `--quick` | Phase 1 末尾生成基础 HTML（播客带占位符），不等 Phase 2 |
 | `--no-save` | 不生成 HTML |
-| `--no-html` | 只生成 .md，跳过 HTML |
+| `--no-html` | 只生成 .md，跳过 HTML（新增 flag，需同步添加到 SKILL.md Arguments 表） |
 
 ### `--quick` 下的 HTML 生成
 
@@ -272,3 +340,6 @@ Phase 1 完成后立即生成 HTML（播客部分有 `⏳ 深度摘要生成中.
 - 在线托管（GitHub Pages 等）
 - digest 正文翻译（只有 UI 外壳语言切换）
 - 搜索/过滤功能（YAGNI，可后续加）
+- 可访问性优化（aria 标签等，后续版本）
+- 打印样式（@media print）
+- 文件大小优化（CSS 共享等，`file:///` 约束下必须自包含）
