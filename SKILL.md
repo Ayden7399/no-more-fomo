@@ -193,7 +193,24 @@ hn:
     - "robotics"
     - "computer vision"
 
-language: en                    # en | zh — output language
+podcasts:
+  # ... existing add/remove fields stay unchanged ...
+  depth: full                   # full | none (default: full)
+                                #   full = TLDR + chapters + speaker quotes
+                                #   none = title + description only (skip Phase 2 podcasts)
+  max_episodes: 3               # Max episodes per podcast to deep-process (default: 3)
+  cache_dir: ~/no-more-fomo/.cache/pods  # Transcript cache directory
+
+discovery:
+  enabled: true                 # Enable s.jina.ai discovery layer (default: true)
+  max_per_topic: 3              # Max discoveries per topic (default: 3)
+
+topic_search:
+  enabled: true                 # Enable xreach search supplementation (default: true)
+  min_mentions: 2               # Entity must be mentioned N+ times to trigger search (default: 2)
+  max_topics: 5                 # Max topics to search (default: 5)
+
+language: zh                    # zh | en — output language (default: zh)
 ```
 
 **Merge rules:**
@@ -534,15 +551,26 @@ Sources: Tier1-KOLs(N) [Tier2-Companies(N)] Labs(N) Podcasts(N/深度N) HN(N) HF
 
 | Argument | Effect |
 |----------|--------|
-| (none) | Tier 1 KOLs + blogs + podcasts + HN |
+| (none) | Phase 1 (all default sources) + Phase 2 (deep processing) |
 | `--full` | Also fetch Tier 2 company/product accounts |
-| `--transcripts` | Fetch transcripts for new podcast episodes and append summaries |
+| `--quick` | Phase 1 only — skip Phase 2 deep processing |
+| `--transcripts` | *(deprecated)* Phase 2 does this by default now |
 | `@handle` | Add extra Twitter accounts (repeatable) |
-| `--twitter-only` | Skip blogs, podcasts, and HN |
-| `--hn-only` | Skip Twitter, blogs, and podcasts |
-| `--podcasts-only` | Only check podcast feeds |
+| `--twitter-only` | Skip blogs, podcasts, and HN. Topic Search + Discovery still run. |
+| `--hn-only` | Skip Twitter, blogs, and podcasts. Topic Search + Discovery still run. |
+| `--podcasts-only` | Only podcast feeds + Phase 2 podcast deep processing |
 | `--no-save` | Print results, don't save to file |
 | `--query "term"` | Add custom HN search query |
+
+**Flag combinations:**
+
+| Combo | Behavior |
+|-------|----------|
+| `--quick` | Phase 1 only |
+| `--quick --full` | Phase 1 + Tier 2, no Phase 2 |
+| `--podcasts-only` | RSS + Phase 2 deep summaries |
+| `--podcasts-only --quick` | RSS only, no deep summaries |
+| `--twitter-only --quick` | Phase 1 Twitter only |
 
 ## Common Mistakes
 
