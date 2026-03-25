@@ -565,6 +565,7 @@ Sources: Tier1-KOLs(N) [Tier2-Companies(N)] Labs(N) Podcasts(N/深度N) HN(N) HF
 | `--hn-only` | Skip Twitter, blogs, and podcasts. Topic Search + Discovery still run. |
 | `--podcasts-only` | Only podcast feeds + Phase 2 podcast deep processing |
 | `--no-save` | Print results, don't save to file |
+| `--no-html` | Only generate .md, skip HTML output |
 | `--query "term"` | Add custom HN search query |
 
 **Flag combinations:**
@@ -577,6 +578,8 @@ Sources: Tier1-KOLs(N) [Tier2-Companies(N)] Labs(N) Podcasts(N/深度N) HN(N) HF
 | `--podcasts-only` | RSS + Phase 2 deep summaries |
 | `--podcasts-only --quick` | RSS only, no deep summaries |
 | `--twitter-only --quick` | Phase 1 Twitter only |
+| `--no-html` | .md only, no HTML generation |
+| `--quick --no-html` | Phase 1 .md only, no Phase 2, no HTML |
 
 ## Common Mistakes
 
