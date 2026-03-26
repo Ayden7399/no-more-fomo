@@ -390,9 +390,9 @@ curl -s "https://r.jina.ai/https://huggingface.co/MODEL_ID" | head -40
 # No More FOMO Digest — YYYY-MM-DD
 
 ## 今日要点
-1. [Most important — 1 sentence]
-2. [Second — 1 sentence]
-3. [Third — 1 sentence]
+1. **[Title]** — [1 sentence summary] | [link](URL)
+2. **[Title]** — [1 sentence summary] | [link](URL)
+3. **[Title]** — [1 sentence summary] | [link](URL)
 
 ## 模型与发布
 - **[Name]** — [what it is, key capability, how it compares to previous] | [HF](URL) [paper](URL) | @source | Likes: N
@@ -652,6 +652,7 @@ bun /path/to/no-more-fomo/scripts/render.js ~/no-more-fomo/YYYY-MM-DD-zh.md
 | Using `.data.items[]` for xreach | Correct path is `.items[]` — there is no `.data` wrapper |
 | Using `.entities.urls` for xreach | This field does not exist. Construct tweet links from `.id`: `https://x.com/HANDLE/status/ID` |
 | Items without reference links | **Every item MUST have at least one clickable `[link](URL)`** — arxiv, github, blog, HF, HN, or tweet link. Items with only @handle and no URL are NOT acceptable. For Twitter-only items, `[tweet](https://x.com/HANDLE/status/ID)` is the minimum. |
+| Highlights without links | **每条今日要点 MUST end with `| [link](URL)`** — this is the most visible section. Use tweet link, blog link, or arxiv link. Never leave a highlight without a clickable reference. |
 | Chinese digest missing highlights | render.js matches both `Top Highlights` and `今日要点`. Also matches `Sources:/来源:` and `Total:/总计:` for footer. |
 | Ignoring dedup | Same URL from Twitter + HN = one entry |
 | Stale blog/podcast posts | Blogs: 7 days, Podcasts: 7 days |

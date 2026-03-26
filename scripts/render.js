@@ -257,6 +257,16 @@ const template = fs.readFileSync(templatePath, 'utf-8');
 
 const dateMatch = path.basename(mdPath).match(/(\d{4}-\d{2}-\d{2})/);
 const date = dateMatch ? dateMatch[1] : 'unknown';
+const isZh = path.basename(mdPath).includes('-zh');
+
+// Compute all available dates for date nav
+const allDates = fs.readdirSync(outputDir)
+  .filter(f => /^\d{4}-\d{2}-\d{2}\.html$/.test(f))
+  .map(f => f.replace('.html', ''))
+  .sort();
+const currentIdx = allDates.indexOf(date);
+const prevDate = currentIdx > 0 ? allDates[currentIdx - 1] : null;
+const nextDate = currentIdx < allDates.length - 1 ? allDates[currentIdx + 1] : null;
 
 const sections = parseMd(md);
 const highlightsSection = sections.find(s => s.meta.id === 'highlights');
@@ -271,14 +281,33 @@ const footerText = [footerMatch?.[1], totalMatch?.[1]].filter(Boolean).join(' | 
 const totalItems = totalMatch ? totalMatch[1] : '';
 const metaText = totalItems;
 
+// Build date nav HTML
+function buildDateNav() {
+  const zhSuffix = isZh ? '-zh' : '';
+  const prevLink = prevDate
+    ? `<a href="./${prevDate}${zhSuffix}.html" class="date-nav-btn">← ${prevDate}</a>`
+    : `<span class="date-nav-btn disabled">← </span>`;
+  const nextLink = nextDate
+    ? `<a href="./${nextDate}${zhSuffix}.html" class="date-nav-btn">${nextDate} →</a>`
+    : `<span class="date-nav-btn disabled"> →</span>`;
+
+  const dateBtns = allDates.map(d => {
+    const cls = d === date ? 'date-chip active' : 'date-chip';
+    return `<a href="./${d}${zhSuffix}.html" class="${cls}">${d.slice(5)}</a>`;
+  }).join('');
+
+  return `${prevLink}<div class="date-chips">${dateBtns}</div>${nextLink}`;
+}
+
 const html = template
   .replace(/\{\{DIGEST_DATE\}\}/g, date)
-  .replace(/\{\{DIGEST_LANG\}\}/g, 'zh')
+  .replace(/\{\{DIGEST_LANG\}\}/g, isZh ? 'zh' : 'en')
   .replace(/\{\{DIGEST_META\}\}/g, esc(metaText))
   .replace('{{DIGEST_HIGHLIGHTS}}', highlightsSection ? renderHighlights(highlightsSection) : '')
   .replace('{{DIGEST_SIDEBAR_NAV}}', renderSidebarNav(contentSections))
   .replace('{{DIGEST_SECTIONS}}', contentSections.map(renderSection).join('\n'))
-  .replace('{{DIGEST_FOOTER}}', `<span class="footer-text">${esc(footerText)}</span>`);
+  .replace('{{DIGEST_FOOTER}}', `<span class="footer-text">${esc(footerText)}</span>`)
+  .replace('{{DIGEST_DATE_NAV}}', buildDateNav());
 
 const htmlPath = path.resolve(mdPath.replace(/\.md$/, '.html'));
 fs.writeFileSync(htmlPath, html);
