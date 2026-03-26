@@ -232,34 +232,39 @@ Launch ALL fetches in parallel. Use separate Bash tool calls. **First read `~/.n
 - `createdAt` — format: `"Tue Mar 24 16:56:24 +0000 2026"`
 
 ```bash
-# Template for each account — extracts id for tweet links:
-xreach tweets @HANDLE --json -n N | jq '[.items[] | select(.isRetweet==false or .isQuote==true) | {id,text: .text[:300],createdAt,likeCount,retweetCount,isQuote}]'
+# Template for each account — extracts id for tweet links, filters to last 24h:
+CUTOFF=$(date -u -v-24H +"%Y-%m-%dT%H:%M:%S" 2>/dev/null || date -u -d "24 hours ago" +"%Y-%m-%dT%H:%M:%S")
+xreach tweets @HANDLE --json -n N | jq --arg cutoff "$CUTOFF" '[.items[] | select(.isRetweet==false or .isQuote==true) | select(.createdAt | strptime("%a %b %d %H:%M:%S %z %Y") | strftime("%Y-%m-%dT%H:%M:%S") > $cutoff) | {id,text: .text[:300],createdAt,likeCount,retweetCount,isQuote}]'
 ```
 
 **Constructing tweet links:** For every tweet used in the digest, construct the link as `[tweet](https://x.com/HANDLE/status/ID)`. This is the **primary reference link** for Twitter-sourced items.
 
 **Twitter — Tier 1 (always, batch accounts to reduce tool calls):**
 ```bash
+# Set 24h cutoff ONCE before all batches (macOS + Linux compatible)
+CUTOFF=$(date -u -v-24H +"%Y-%m-%dT%H:%M:%S" 2>/dev/null || date -u -d "24 hours ago" +"%Y-%m-%dT%H:%M:%S")
+```
+```bash
 # Batch 1: High volume
-xreach tweets @_akhaliq --json -n 50 | jq '[.items[] | select(.isRetweet==false or .isQuote==true) | {id,text: .text[:300],createdAt,likeCount,retweetCount,isQuote}]'
-xreach tweets @dotey --json -n 30 | jq '[.items[] | select(.isRetweet==false or .isQuote==true) | {id,text: .text[:300],createdAt,likeCount,retweetCount,isQuote}]'
+xreach tweets @_akhaliq --json -n 50 | jq --arg cutoff "$CUTOFF" '[.items[] | select(.isRetweet==false or .isQuote==true) | select(.createdAt | strptime("%a %b %d %H:%M:%S %z %Y") | strftime("%Y-%m-%dT%H:%M:%S") > $cutoff) | {id,text: .text[:300],createdAt,likeCount,retweetCount,isQuote}]'
+xreach tweets @dotey --json -n 30 | jq --arg cutoff "$CUTOFF" '[.items[] | select(.isRetweet==false or .isQuote==true) | select(.createdAt | strptime("%a %b %d %H:%M:%S %z %Y") | strftime("%Y-%m-%dT%H:%M:%S") > $cutoff) | {id,text: .text[:300],createdAt,likeCount,retweetCount,isQuote}]'
 ```
 ```bash
 # Batch 2: KOLs
-for h in karpathy bcherny oran_ge trq212 swyx emollick; do echo "---$h---"; xreach tweets @$h --json -n 20 | jq -c "[.items[] | select(.isRetweet==false or .isQuote==true) | {id,text: .text[:300],createdAt,likeCount,isQuote}]"; done
+for h in karpathy bcherny oran_ge trq212 swyx emollick; do echo "---$h---"; xreach tweets @$h --json -n 20 | jq -c --arg cutoff "$CUTOFF" "[.items[] | select(.isRetweet==false or .isQuote==true) | select(.createdAt | strptime(\"%a %b %d %H:%M:%S %z %Y\") | strftime(\"%Y-%m-%dT%H:%M:%S\") > \$cutoff) | {id,text: .text[:300],createdAt,likeCount,isQuote}]"; done
 ```
 ```bash
 # Batch 3: More KOLs
-for h in drjimfan simonw hardmaru ylecun; do echo "---$h---"; xreach tweets @$h --json -n 20 | jq -c "[.items[] | select(.isRetweet==false or .isQuote==true) | {id,text: .text[:300],createdAt,likeCount,isQuote}]"; done
+for h in drjimfan simonw hardmaru ylecun; do echo "---$h---"; xreach tweets @$h --json -n 20 | jq -c --arg cutoff "$CUTOFF" "[.items[] | select(.isRetweet==false or .isQuote==true) | select(.createdAt | strptime(\"%a %b %d %H:%M:%S %z %Y\") | strftime(\"%Y-%m-%dT%H:%M:%S\") > \$cutoff) | {id,text: .text[:300],createdAt,likeCount,isQuote}]"; done
 ```
 ```bash
 # Batch 4: Company accounts (may hit rate limits — retry after 10s if needed)
-for h in cursor_ai AnthropicAI OpenAI GoogleDeepMind; do echo "---$h---"; xreach tweets @$h --json -n 15 | jq -c "[.items[] | select(.isRetweet==false or .isQuote==true) | {id,text: .text[:300],createdAt,likeCount,isQuote}]"; done
+for h in cursor_ai AnthropicAI OpenAI GoogleDeepMind; do echo "---$h---"; xreach tweets @$h --json -n 15 | jq -c --arg cutoff "$CUTOFF" "[.items[] | select(.isRetweet==false or .isQuote==true) | select(.createdAt | strptime(\"%a %b %d %H:%M:%S %z %Y\") | strftime(\"%Y-%m-%dT%H:%M:%S\") > \$cutoff) | {id,text: .text[:300],createdAt,likeCount,isQuote}]"; done
 ```
 
 **Twitter — Tier 2 (only with `--full` flag):**
 ```bash
-for h in xai WindsurfAI cognition replit huggingface llama_index; do echo "---$h---"; xreach tweets @$h --json -n 15 | jq -c "[.items[] | select(.isRetweet==false or .isQuote==true) | {id,text: .text[:300],createdAt,likeCount,isQuote}]"; done
+for h in xai WindsurfAI cognition replit huggingface llama_index; do echo "---$h---"; xreach tweets @$h --json -n 15 | jq -c --arg cutoff "$CUTOFF" "[.items[] | select(.isRetweet==false or .isQuote==true) | select(.createdAt | strptime(\"%a %b %d %H:%M:%S %z %Y\") | strftime(\"%Y-%m-%dT%H:%M:%S\") > \$cutoff) | {id,text: .text[:300],createdAt,likeCount,isQuote}]"; done
 # + any extra @handles from arguments, same jq filter
 ```
 
@@ -324,6 +329,7 @@ curl -s "https://hn.algolia.com/api/v1/search?query=LLM+OR+GPT+OR+Claude+OR+Gemi
 - Include original tweets and quote tweets with commentary
 - Exclude pure retweets (`isRetweet: true` without `isQuote: true`) and reply threads
 - Quality: `likeCount > 100` for @_akhaliq, `> 50` for others (lower on weekends)
+- **Dedup vs previous day:** If `~/no-more-fomo/YYYY-MM-(DD-1).md` exists, scan it for titles. Skip any item whose title/name already appeared in the previous digest.
 
 **Blogs:** Only posts from last 7 days. Skip non-technical posts (hiring, events).
 
@@ -658,6 +664,7 @@ bun /path/to/no-more-fomo/scripts/render.js ~/no-more-fomo/YYYY-MM-DD-zh.md
 | Stale blog/podcast posts | Blogs: 7 days, Podcasts: 7 days |
 | Empty section hidden | Show "No new episodes this week" |
 | xreach rate limiting | Company accounts often hit rate limits. Retry after 10s. Don't batch all 16 accounts in parallel — use 4 batches of 4. |
+| Repeating yesterday's headlines | Before generating the digest, read the previous day's .md file (if it exists) and exclude any item that already appeared. The jq time filter catches most cases, but always cross-check highlights. |
 
 ## Scheduling
 
